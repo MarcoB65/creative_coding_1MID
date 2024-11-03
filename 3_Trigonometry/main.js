@@ -43,7 +43,7 @@ oggettoSvg.addEventListener("load", function () {
     });
     anima();
   } else {
-    console.error("nessun percorso SVG trovato.");
+    console.error("nessun SVG trovato.");
   }
 });
 function anima() {
