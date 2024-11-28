@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exercice_Webcam_Boumya</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+
+      #controlContainer {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 5px;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      #shapeSlider,
+      #resolutionSlider {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      label {
+        font-size: 14px;
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      span {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controlContainer">
+
+      <label for="shapeSlider">
+       <span id="shapeText">Contents: Square</span>
+      </label>
+      <input type="range" id="shapeSlider" min="0" max="100" value="0" />
+
+      <label for="resolutionSlider">
+        <span id="resolutionText">Resolution: 20px</span>
+      </label>
+      <input type="range" id="resolutionSlider" min="0" max="3" value="0" />
+
+    </div>
+
+    <script type="module" src="App.js"></script>
+  </body>
+</html>
