@@ -4,6 +4,8 @@ export default class App extends BaseApp {
   constructor() {
     super();
 
+    ctx.filter = "blur(10px)";
+
     // audio setup
     this.audioFile = "./Sound.wav";
     this.audio = new Audio(this.audioFile);
