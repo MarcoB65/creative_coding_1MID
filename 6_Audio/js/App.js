@@ -4,10 +4,8 @@ export default class App extends BaseApp {
   constructor() {
     super();
 
-    ctx.filter = "blur(10px)";
-
     // audio setup
-    this.audioFile = "./Sound.wav";
+    this.audioFile = "./SoundOF.wav";
     this.audio = new Audio(this.audioFile);
     this.isPlaying = false;
 
@@ -17,22 +15,11 @@ export default class App extends BaseApp {
     this.canvas.height = window.innerHeight;
     document.body.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
-
-    // // Initialisation du canvas et du contexte de dessin
-    // this.canvas = document.createElement("canvas");
-    // this.canvas.width = window.innerWidth;
-    // this.canvas.height = window.innerHeight;
-    // document.body.appendChild(this.canvas);
-    // this.ctx = this.canvas.getContext("2d");
-    // this.width = this.canvas.width;
-    // this.height = this.canvas.height;
 
     this.letters = "SOUND";
     this.lineYCenter = this.height / 2;
     this.lineSpacing = 100; // Ddistanza linee
-    this.lineWidth = this.width * 0.4;
+    this.lineWidth = this.width * 0.5;
     this.lineXStart = (this.width - this.lineWidth) / 2;
 
     this.init();
@@ -97,7 +84,7 @@ export default class App extends BaseApp {
   drawLetters() {
     const totalPoints = this.waveArray.length / 2; // mirror
     const segmentWidth = this.lineWidth / totalPoints;
-    const fontSize = 25;
+    const fontSize = 35;
 
     //non sovrappone
     let letterIndex = 0;
@@ -114,18 +101,27 @@ export default class App extends BaseApp {
       this.ctx.fillStyle = `blue`;
       this.ctx.font = `bold ${fontSize}px Roboto`;
 
-      this.ctx.fillText(letter, xLeft, this.lineYCenter + yOffset);
-      this.ctx.fillText(letter, xRight, this.lineYCenter + yOffset);
-
+      const baselineOffset = fontSize / 2;
       this.ctx.fillText(
         letter,
         xLeft,
-        this.lineYCenter - this.lineSpacing - yOffset
+        this.lineYCenter + baselineOffset + yOffset
       );
       this.ctx.fillText(
         letter,
         xRight,
-        this.lineYCenter - this.lineSpacing - yOffset
+        this.lineYCenter + baselineOffset + yOffset
+      );
+
+      this.ctx.fillText(
+        letter,
+        xLeft,
+        this.lineYCenter - this.lineSpacing + baselineOffset - yOffset
+      );
+      this.ctx.fillText(
+        letter,
+        xRight,
+        this.lineYCenter - this.lineSpacing + baselineOffset - yOffset
       );
 
       letterIndex++;
@@ -134,8 +130,11 @@ export default class App extends BaseApp {
 
   render() {
     this.analyseWaveform();
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    this.drawLine();
+
+    // "echo"
+    this.ctx.fillStyle = "rgba(255, 255, 255, 0.05)"; // questo  bianco x schiarire!!
+    this.ctx.fillRect(0, 0, this.width, this.height);
+
     this.drawLetters();
 
     requestAnimationFrame(this.render.bind(this));
