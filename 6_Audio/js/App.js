@@ -14,7 +14,6 @@ export default class App extends BaseApp {
     this.canvas.height = window.innerHeight;
     document.body.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
-
     this.letters = "SOUND";
     this.lineYCenter = this.height / 2;
     this.lineSpacing = 100; // Ddistanza linee
