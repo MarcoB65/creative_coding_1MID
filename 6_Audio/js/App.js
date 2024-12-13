@@ -10,7 +10,6 @@ export default class App extends BaseApp {
     this.isPlaying = false;
 
     //canvas setup
-    this.canvas = document.createElement("canvas");
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     document.body.appendChild(this.canvas);
