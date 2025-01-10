@@ -3,49 +3,68 @@ import { Camera } from "@mediapipe/camera_utils";
 import { FaceMesh } from "@mediapipe/face_mesh";
 import { drawConnectors } from "@mediapipe/drawing_utils";
 
-let letterSize = 30;
+// Variabili globali per gestire le lettere
+let letterSize = 50;
 let lettersVisible = true;
-let isShuffling = false;
-let shuffleStartTime = null;
-const SHUFFLE_DURATION = 3000; // 3 secondi in millisecondi
 
+//-- SETUP VIDEO E CANVAS -
+// Dai, creiamo gli elementi base per far funzionare sta roba
 const videoElement = document.createElement("video");
 const canvasElement = document.createElement("canvas");
 const canvasCtx = canvasElement.getContext("2d");
 
-// Modifica le dimensioni per essere a schermo intero
+// Facciamo il video a tutto schermo, che è più figo
 videoElement.style.width = "100vw";
 videoElement.style.height = "100vh";
 videoElement.style.objectFit = "cover";
 
+// Stesso discorso per il canvas
 canvasElement.width = window.innerWidth;
 canvasElement.height = window.innerHeight;
 canvasElement.style.width = "100vw";
 canvasElement.style.height = "100vh";
 
-// Crea container e aggiungi elementi
+// ---------- COSTRUZIONE DELL'INTERFACCIA (roba che si fa in DOM!!!!!!!) ----------
+// mettiamo tutto in un container, che è più ordinato
 const container = document.createElement("div");
 container.className = "container";
 container.appendChild(videoElement);
 container.appendChild(canvasElement);
 
-// Crea toolbar
+// Oora facciamo una bella toolbar con tutti i controlli
 const toolbar = document.createElement("div");
 toolbar.className = "toolbar";
+toolbar.style.display = "flex";
+toolbar.style.alignItems = "center";
+toolbar.style.gap = "20px";
+toolbar.style.background = "rgba(255, 255, 255, 0.2)";
+toolbar.style.padding = "10px 20px";
 
-// Crea e aggiungi bottone shuffle
+// ---------- BOTTONI E CONTROLLI ----------
+// Bottone per mischiare le lettere (quello che fa impazzire tutto)
 const shuffleButton = document.createElement("button");
 shuffleButton.id = "shuffle-button";
 shuffleButton.textContent = "Shuffle";
+shuffleButton.style.background = "#2196F3";
+shuffleButton.style.color = "white";
+shuffleButton.style.border = "none";
+shuffleButton.style.padding = "8px 16px";
+shuffleButton.style.borderRadius = "4px";
+shuffleButton.style.cursor = "pointer";
+shuffleButton.style.fontWeight = "bold";
 toolbar.appendChild(shuffleButton);
 
-// Crea e aggiungi controllo dimensione
+// Slider per cambiare la dimensione delle lettere
 const controlGroup = document.createElement("div");
 controlGroup.className = "control-group";
+controlGroup.style.display = "flex";
+controlGroup.style.alignItems = "center";
+controlGroup.style.gap = "10px";
 
 const sizeLabel = document.createElement("label");
 sizeLabel.htmlFor = "size-slider";
 sizeLabel.textContent = "Size";
+sizeLabel.style.color = "white";
 
 const sizeSlider = document.createElement("input");
 sizeSlider.type = "range";
@@ -58,18 +77,28 @@ controlGroup.appendChild(sizeLabel);
 controlGroup.appendChild(sizeSlider);
 toolbar.appendChild(controlGroup);
 
-// Crea e aggiungi bottone toggle
+// bottone per far sparire/apparire le lettere (tipo magia)
 const toggleButton = document.createElement("button");
 toggleButton.id = "toggle-letters";
 toggleButton.textContent = "Toggle Letters";
+toggleButton.style.background = "#2196F3";
+toggleButton.style.color = "white";
+toggleButton.style.border = "none";
+toggleButton.style.padding = "8px 16px";
+toggleButton.style.borderRadius = "4px";
+toggleButton.style.cursor = "pointer";
+toggleButton.style.fontWeight = "bold";
 toolbar.appendChild(toggleButton);
 
-// Aggiungi elementi al DOM
+// Buttiamo tutto nella pagina
 document.body.appendChild(container);
 document.body.appendChild(toolbar);
 
+// --- LETTERE ----------
+// Array per tenere tutte le lettere che mettiamo sulla faccia
 let faceLetters = [];
 
+// questa è la classe che gestisce ogni singola lettera
 class FaceLetter {
   constructor(x, y) {
     this.x = x;
@@ -77,12 +106,9 @@ class FaceLetter {
     this.letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
     this.isBlue = Math.random() > 0.5;
     this.fontSize = letterSize;
-    this.startX = x;
-    this.startY = y;
-    this.targetX = x;
-    this.targetY = y;
   }
 
+  // Questo disegna la lettera sul canvas
   draw(ctx) {
     if (!lettersVisible) return;
 
@@ -92,56 +118,44 @@ class FaceLetter {
     ctx.font = `${this.fontSize}px Arial`;
     ctx.fillText(this.letter, this.x, this.y);
   }
-
-  updatePosition(progress) {
-    this.x = this.startX + (this.targetX - this.startX) * progress;
-    this.y = this.startY + (this.targetY - this.startY) * progress;
-  }
 }
 
+// ---------- EFFETTO SHUFFLE ----------
+// Variabile per controllare l'animazione dello shuffle
+let shuffleInterval = null;
+
+// questa funzione fa impazzire tutte le lettere per 3 secondi
 function shuffleLetters() {
-  if (isShuffling) return;
-
-  isShuffling = true;
-  shuffleStartTime = performance.now();
-
-  faceLetters.forEach((letter) => {
-    letter.startX = letter.x;
-    letter.startY = letter.y;
-  });
-
-  const tempPositions = faceLetters.map((letter) => ({
-    x: letter.x,
-    y: letter.y,
-    letter: letter.letter,
-    isBlue: letter.isBlue,
-    fontSize: letter.fontSize,
-  }));
-
-  for (let i = tempPositions.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [tempPositions[i], tempPositions[j]] = [tempPositions[j], tempPositions[i]];
+  if (shuffleInterval) {
+    clearInterval(shuffleInterval);
   }
 
-  faceLetters.forEach((letter, i) => {
-    letter.targetX = tempPositions[i].x;
-    letter.targetY = tempPositions[i].y;
-    letter.letter = tempPositions[i].letter;
-    letter.isBlue = tempPositions[i].isBlue;
-    letter.fontSize = tempPositions[i].fontSize;
-  });
+  let duration = 3000; // druata animaizoe al volo
+  let startTime = Date.now();
+
+  shuffleInterval = setInterval(() => {
+    faceLetters.forEach((letter) => {
+      letter.letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+      letter.isBlue = Math.random() > 0.5;
+    });
+
+    if (Date.now() - startTime >= duration) {
+      clearInterval(shuffleInterval);
+      shuffleInterval = null;
+    }
+  }, 100);
 }
 
+// ---- GESTIONE FACCIA E RENDERING -----
+// questa funzione viene chiamata ogni volta che MediaPipe trova una faccia
 function onFaceResults(results) {
-  // Evita di accumulare richieste di animazione
   if (window.rafId) {
     cancelAnimationFrame(window.rafId);
   }
 
   canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-  // Riduci le chiamate di drawImage usando requestAnimationFrame
-  if (!isShuffling) {
+  if (!shuffleInterval) {
     canvasCtx.drawImage(
       results.image,
       0,
@@ -153,49 +167,31 @@ function onFaceResults(results) {
 
   if (results.multiFaceLandmarks) {
     for (const landmarks of results.multiFaceLandmarks) {
-      // Aggiorna le posizioni solo se necessario
       if (faceLetters.length === 0) {
-        // Inizializzazione lettere
+        // Prima volta: creiamo tutte le lettere
         faceLetters = landmarks.map((landmark) => {
           const x = landmark.x * canvasElement.width;
           const y = landmark.y * canvasElement.height;
           return new FaceLetter(x, y);
         });
-      } else if (!isShuffling) {
-        // Aggiorna posizioni
+      } else {
+        // Aggiorniamo solo le posizioni delle lettere esistenti
         landmarks.forEach((landmark, i) => {
           const letter = faceLetters[i];
           letter.x = landmark.x * canvasElement.width;
           letter.y = landmark.y * canvasElement.height;
-          letter.targetX = letter.x;
-          letter.targetY = letter.y;
-          letter.startX = letter.x;
-          letter.startY = letter.y;
         });
-      }
-
-      if (isShuffling) {
-        const currentTime = performance.now();
-        const elapsed = currentTime - shuffleStartTime;
-        const progress = Math.min(elapsed / SHUFFLE_DURATION, 1);
-
-        faceLetters.forEach((letter) => {
-          letter.updatePosition(progress);
-        });
-
-        if (progress === 1) {
-          isShuffling = false;
-        }
       }
 
       faceLetters.forEach((letter) => letter.draw(canvasCtx));
     }
   }
 
-  // Usa una singola richiesta di animazione
   window.rafId = requestAnimationFrame(() => onFaceResults(results));
 }
 
+//--- SETUP MEDIAPIPE --
+// Configuriamo MediaPipe per tracciare la faccia
 const faceMesh = new FaceMesh({
   locateFile: (file) => {
     return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
@@ -211,6 +207,7 @@ faceMesh.setOptions({
 
 faceMesh.onResults(onFaceResults);
 
+// AVVI la webcam
 const camera = new Camera(videoElement, {
   onFrame: async () => {
     await faceMesh.send({ image: videoElement });
@@ -221,7 +218,8 @@ const camera = new Camera(videoElement, {
 
 camera.start();
 
-// Event Listeners
+//---------- EVENT LISTENERS -------
+//gestiscetutti i click e le interazioni
 shuffleButton.addEventListener("click", shuffleLetters);
 
 sizeSlider.addEventListener("input", (e) => {
@@ -233,7 +231,6 @@ toggleButton.addEventListener("click", () => {
   lettersVisible = !lettersVisible;
 });
 
-// Aggiungi gestione del resize per evitare problemi di performance
 let resizeTimeout;
 window.addEventListener("resize", () => {
   if (resizeTimeout) {

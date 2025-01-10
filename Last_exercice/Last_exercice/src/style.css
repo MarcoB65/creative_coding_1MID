@@ -178,20 +178,20 @@ video, canvas {
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
-    background: #4CAF50;
+    background: #2196F3;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .toolbar input[type="range"]::-webkit-slider-thumb:hover {
-    background: #45a049;
+    background: #1976D2;
     transform: scale(1.1);
 }
 
-#shuffle-button, #toggle-letters {
-    background-color: #4CAF50;
-    color: white;
+.toolbar-button {
+    background-color: hsl(247, 100%, 50%);
+    color:hsl(247, 100%, 50%);
     border: none;
     padding: 10px 20px;
     border-radius: 25px;
@@ -204,36 +204,12 @@ video, canvas {
     font-family: Helvetica, Arial, sans-serif;
 }
 
-#shuffle-button:hover, #toggle-letters:hover {
-    background-color: #45a049;
+.toolbar-button:hover {
+    background-color: #1976D2;
     transform: translateY(-1px);
 }
 
-#shuffle-button:active, #toggle-letters:active {
-    transform: translateY(1px);
-}
-
-#fall-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.2s ease;
-    font-family: Helvetica, Arial, sans-serif;
-}
-
-#fall-button:hover {
-    background-color: #45a049;
-    transform: translateY(-1px);
-}
-
-#fall-button:active {
+.toolbar-button:active {
     transform: translateY(1px);
 }
 
