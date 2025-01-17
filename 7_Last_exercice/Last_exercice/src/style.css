@@ -166,9 +166,11 @@ video, canvas {
 }
 
 .toolbar input[type="range"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     width: 150px;
     height: 4px;
-    -webkit-appearance: none;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
     outline: none;
@@ -191,7 +193,7 @@ video, canvas {
 
 .toolbar-button {
     background-color: hsl(247, 100%, 50%);
-    color:hsl(247, 100%, 50%);
+    color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 25px;
@@ -213,4 +215,61 @@ video, canvas {
     transform: translateY(1px);
 }
 
+.dropdown {
+  position: relative;
+  width: 200px;
+}
+
+.dropdown-header {
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-header:hover {
+  background: #1976D2 !important;
+}
+
+.dropdown-content {
+  transition: opacity 0.3s ease;
+}
+
+/* Stile per il gruppo di controllo dello slider */
+.control-group {
+  padding: 10px 0;
+  width: 100%;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: bold;
+}
+
+.control-group input[type="range"] {
+  width: 100%;
+  margin: 5px 0;
+}
+
+/* Previeni la selezione del testo */
+.dropdown-header {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.distance-warning {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 18px;
+  font-weight: regular;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  font-family: Helvetica;
+  padding: 10px;
+  border-radius: 5px;
+}
 
